@@ -1,0 +1,62 @@
+/* Detected Objects Styling */
+.objects-detected-container {
+  background-color: rgba(14, 8, 105, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.detected-objects-title {
+  color: #bee74c;
+  font-size: 24px;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.objects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.object-item {
+  display: flex;
+  justify-content: space-between;
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 10px 15px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.object-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.object-name {
+  font-weight: bold;
+  color: #61dafb;
+}
+
+.object-confidence {
+  color: #4CAF50;
+  font-weight: 300;
+}
+
+.no-objects {
+  color: #f44336;
+  font-size: 18px;
+  margin: 20px 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .objects-detected-container {
+      width: 90%;
+      margin: 20px auto;
+  }
+}

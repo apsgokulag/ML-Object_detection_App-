@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YOLO Object Detection</title>
+    <link rel="stylesheet" type="text/css" href="../static/index.css">
+    <script
+        src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script type="text/javascript" src="../static/index.js"></script>
+    <style>
+        /* Enhanced Styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .App {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .App-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* New Styling for Project Title */
+        #highlighted-header {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            padding: 15px 30px;
+            border-radius: 100px; /* Creates an oval shape */
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 1.5rem;
+        }
+
+        #highlighted-header:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .pre_img {
+            max-width: 100%;
+            max-height: 600px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            border: 2px solid #4a4e69;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #imagebox {
+            max-width: 100%;
+            max-height: 600px;
+            object-fit: contain;
+        }
+
+        .file-upload-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        #imageinput {
+            display: none;
+        }
+
+        .custom-file-upload {
+            display: inline-block;
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #575699;
+            color: white;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            border: 1px solid #ffffff;
+        }
+
+        .custom-file-upload:hover {
+            background-color: #333333;
+        }
+
+        #sendbutton {
+            padding: 10px 20px;
+            background-color: #054e30;
+            color: white;
+            border: 1px solid #28495f;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #sendbutton:hover {
+            background-color: #333333;
+        }
+
+        #detected-objects-container {
+            margin-top: 20px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .detected-objects-title {
+            color: #4CAF50;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .object-detection-results {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .object-item {
+            display: flex;
+            justify-content: space-between;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .object-name {
+            color: #2196F3;
+            font-weight: bold;
+        }
+
+        .object-confidence {
+            color: #4CAF50;
+        }
+
+        h2 {
+            font-size: 1rem;
+            color: #b0b0b0;
+            background-color: transparent;
+            padding: 10px;
+            text-align: center;
+            transition: color 0.3s ease-in-out;
+            width: 100%;
+            margin: 5px auto;
+            cursor: pointer;
+            font-weight: 300;
+        }
+
+        h2:hover {
+            color: #4CAF50;
+        }
+
+        @media (max-width: 768px) {
+            h2 {
+                font-size: 0.9rem;
+                width: 100%;
+            }
+
+            #highlighted-header {
+                font-size: 1.2rem;
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class='App'>
+    <header class='App-header'>
+        <h1 id="highlighted-header">ML Object Detection App</h1>
+        
+        <h2 id="textcoloring">Upload an image to get detailed insights about it.</h2>
+
+        <div class="pre_img">
+            <img id="imagebox" src="" alt="Uploaded Image">
+        </div>
+
+        <div id="detected-objects-container"></div>
+
+        <div class="file-upload-container">
+            <label for="imageinput" class="custom-file-upload">
+                Choose Image
+            </label>
+            <input id="imageinput" type="file" name="image" onchange="readUrl(this)">
+            <br>
+            <button name="send" id="sendbutton">Detect Objects</button>
+        </div>
+    </header>
+</div>
+
+<script>
+  const h1Element = document.getElementById("highlighted-header");
+
+  h1Element.addEventListener("mouseover", () => {
+      h1Element.style.transform = "scale(1.05)";
+      h1Element.style.boxShadow = "0 10px 20px rgba(0, 0, 0, 0.3)";
+  });
+
+  h1Element.addEventListener("mouseout", () => {
+      h1Element.style.transform = "scale(1)";
+      h1Element.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
+  });
+</script>
+
+</body>
+</html>
